@@ -48,9 +48,9 @@ function main() {
 					x: 10,
 					y: 20,
 					width: 300,
-                	height: 10,
-                	text: "Changes Colour for EVERY Stall/Facility",
-				},{
+					height: 10,
+					text: "Changes Colour for EVERY Stall/Facility",
+				}, {
 					type: "checkbox",
 					name: "randomColour",
 					x: 10,
@@ -61,16 +61,17 @@ function main() {
 					onChange: function onChange(isChecked) {
 						//var isAdmin = checkPermissionCurrentPlayer("cheat");
 						//if (isAdmin) {
-							if (isChecked) {
-								random_colour = true;
-							}
-							else {
-								random_colour = false;
-							}
-							random_colour = isChecked;
-							context.sharedStorage.set("stall_colour_picker.random_colour", random_colour);
-							context.executeAction("stall_colour_picker_set_random_flag");
-					//	}
+						if (isChecked) {
+							random_colour = true;
+						}
+						else {
+							random_colour = false;
+						}
+						random_colour = isChecked;
+						// TODO do this in an action (sharedstorage), or give number as atttribute to executeaction
+						context.sharedStorage.set("stall_colour_picker.random_colour", { random_colour });
+						context.executeAction("stall_colour_picker_set_random_flag", { random_colour });
+						//	}
 					}
 				}, {
 					type: "colourpicker",
@@ -83,10 +84,11 @@ function main() {
 					onChange: function onChange(number) {
 						//var isAdmin = checkPermissionCurrentPlayer("cheat");
 						// if (isAdmin) {
-							stall_colour = number;
-							context.sharedStorage.set("stall_colour_picker.stall_colour", number);
+						stall_colour = number;
+						// TODO do this in an action (sharedstorage), or give number as atttribute to executeaction
+						context.sharedStorage.set("stall_colour_picker.stall_colour", { number });
 
-							context.executeAction("stall_colour_picker_set_colour");
+						context.executeAction("stall_colour_picker_set_colour", { number });
 						//}
 					}
 				}]
@@ -96,22 +98,30 @@ function main() {
 }
 var scpSetColour = function(isExecuting, args) {
 	if (isExecuting) {
+
+		console.log("scpSetColour " + JSON.stringify(args));
+	}
+	if (isExecuting) {
+		var chosencolour = 0;
+		if (typeof args["args"] !== "undefined") {
+			chosencolour = args["args"]["number"];
+		}
+		if (typeof args["number"] !== "undefined") {
+			chosencolour = args["number"];
+		}
+
 		var allrides = map.rides;
 		for (var i = 0; i < allrides.length; i++) {
 			var currRide = allrides[i];
 			if (currRide.classification == "stall" || currRide.classification == "facility") {
-				//console.log(i + " currRide: " + currRide.id + " " + currRide.name + " " + currRide.status + " " + currRide.mode + " " + currRide.classification);
 				var usedColourschemes = currRide.colourSchemes;
 				for (var j = 0; j < usedColourschemes.length; j++) {
-					if (usedColourschemes[j].main == stall_colour) {
-						// Colour is fine
-					}
-					else {
+					if (usedColourschemes[j].main != chosencolour) {
 						var actionType = 0; // TrackColourMain
 						context.executeAction("ridesetappearance", {
 							ride: currRide.id,
 							type: actionType,
-							value: stall_colour,
+							value: chosencolour,
 							index: j
 						}, function(result) {
 							if (result["error"] != 0) {
@@ -137,11 +147,18 @@ var scpSetColour = function(isExecuting, args) {
 var scpSetRandomColour = function(isExecuting, args) {
 	if (isExecuting) {
 		var allrides = map.rides;
+		var chosenRandomFlag = false;
+		if (typeof args["args"] !== "undefined") {
+			chosenRandomFlag = args["args"]["random_colour"];
+		}
+		if (typeof args["random_colour"] !== "undefined") {
+			chosenRandomFlag = args["random_colour"];
+		}
 		for (var i = 0; i < allrides.length; i++) {
 			var currRide = allrides[i];
 			if (currRide.classification == "stall" || currRide.classification == "facility") {
 				var random_as_integer = 0;
-				if (random_colour) {
+				if (chosenRandomFlag) {
 					random_as_integer = 1;
 				}
 
@@ -174,7 +191,7 @@ var scpSetRandomColour = function(isExecuting, args) {
 
 registerPlugin({
 	name: 'stall colour picker',
-	version: '1.0',
+	version: '1.1',
 	authors: ['eluya'],
 	type: 'remote',
 	targetApiVersion: 68,
