@@ -1,5 +1,6 @@
 /// <reference path="../bin/openrct2.d.ts" />
 
+var auto_colour = context.sharedStorage.get("stall_colour_picker.auto_colour", false);
 var stall_colour = context.sharedStorage.get("stall_colour_picker.stall_colour", 0);
 var random_colour = context.sharedStorage.get("stall_colour_picker.random_colour", false);
 
@@ -38,7 +39,7 @@ function main() {
 				id: 1,
 				classification: "Stall Colour Picker",
 				width: 300,
-				height: 83,
+				height: 96,
 				onClose: function onClose() {
 					window = null;
 				},
@@ -51,19 +52,34 @@ function main() {
 					height: 10,
 					text: "Changes Colour for EVERY Stall/Facility",
 				}, {
+          type: "checkbox",
+          name: "autoColour",
+          x: 10,
+          y: 40,
+          width: 130,
+          height: 13,
+          text: "Automatically Recolour New Stalls",
+          tooltip: "Every in-game day, all stall colour schemes will be set to the configured.",
+          isChecked: auto_colour,
+          onChange: function (isChecked) {
+            auto_colour = isChecked;
+            context.sharedStorage.set("stall_colour_picker.auto_colour", auto_colour);
+          }
+        }, {
 					type: "checkbox",
 					name: "randomColour",
 					x: 10,
-					y: 40,
+					y: 60,
 					width: 130,
 					height: 13,
 					text: "Use Random Colour",
+          isChecked: random_colour,
 					onChange: function onChange(isChecked) {
 						//var isAdmin = checkPermissionCurrentPlayer("cheat");
 						//if (isAdmin) {
 						random_colour = isChecked;
 						// TODO do this in an action (sharedstorage), or give number as atttribute to executeaction
-						context.sharedStorage.set("stall_colour_picker.random_colour", { random_colour });
+						context.sharedStorage.set("stall_colour_picker.random_colour", random_colour);
 						context.executeAction("stall_colour_picker_set_random_flag", { random_colour });
 						//	}
 					}
@@ -71,7 +87,7 @@ function main() {
 					type: "colourpicker",
 					name: "pickColour",
 					x: 10,
-					y: 60,
+					y: 80,
 					width: 35,
 					height: 13,
 					colour: stall_colour,
@@ -80,8 +96,7 @@ function main() {
 						// if (isAdmin) {
 						stall_colour = number;
 						// TODO do this in an action (sharedstorage), or give number as atttribute to executeaction
-						context.sharedStorage.set("stall_colour_picker.stall_colour", { number });
-
+						context.sharedStorage.set("stall_colour_picker.stall_colour", stall_colour);
 						context.executeAction("stall_colour_picker_set_colour", { number });
 						//}
 					}
@@ -89,6 +104,16 @@ function main() {
 			})
 		}
 	});
+
+  context.subscribe("interval.day", function () {
+    if (context.sharedStorage.get("stall_colour_picker.auto_colour")) {
+      if (context.sharedStorage.get("stall_colour_picker.random_colour")) {
+        context.executeAction("stall_colour_picker_set_random_flag", { random_colour });
+      } else {
+        context.executeAction("stall_colour_picker_set_colour", { stall_colour });
+      }
+    }
+  });
 }
 
 var scpSetColour = function(isExecuting, args) {
@@ -98,7 +123,9 @@ var scpSetColour = function(isExecuting, args) {
 		var chosencolour = 0;
 		if (typeof args["number"] !== "undefined") {
 			chosencolour = args["number"];
-		}
+		} else if (typeof args["stall_colour"] !== "undefined") {
+      chosencolour = args["stall_colour"]; // added for auto set colours - line 111
+    }
 
 		var allrides = map.rides;
 		for (var i = 0; i < allrides.length; i++) {
@@ -176,7 +203,7 @@ var scpSetRandomColour = function(isExecuting, args) {
 registerPlugin({
 	name: 'stall colour picker',
 	version: '1.1',
-	authors: ['eluya'],
+	authors: ['eluya', 'mrmagic2020'],
 	type: 'remote',
 	targetApiVersion: 68,
 	minApiVersion: 68,
