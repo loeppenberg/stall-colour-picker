@@ -9,6 +9,7 @@ This plug-in should be put into the `plugin` directory of your OpenRCT2 folder. 
 Current features:
 - Set Colours for all Stalls
 - Toggle the "Use Random Colour" Flag for all Stalls.
+- Enable Auto Colour Update for all Stalls
 
 
 This plugin and readme is deeply inspired by other peoples existing plugins. This couldn't exist without them, so thank you, Gymnasiast and others.
