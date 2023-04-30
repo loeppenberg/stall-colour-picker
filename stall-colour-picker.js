@@ -202,7 +202,7 @@ var scpSetRandomColour = function(isExecuting, args) {
 
 registerPlugin({
 	name: 'stall colour picker',
-	version: '1.1',
+	version: '1.2',
 	authors: ['eluya', 'mrmagic2020'],
 	type: 'remote',
 	targetApiVersion: 68,
