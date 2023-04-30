@@ -61,12 +61,6 @@ function main() {
 					onChange: function onChange(isChecked) {
 						//var isAdmin = checkPermissionCurrentPlayer("cheat");
 						//if (isAdmin) {
-						if (isChecked) {
-							random_colour = true;
-						}
-						else {
-							random_colour = false;
-						}
 						random_colour = isChecked;
 						// TODO do this in an action (sharedstorage), or give number as atttribute to executeaction
 						context.sharedStorage.set("stall_colour_picker.random_colour", { random_colour });
@@ -96,16 +90,12 @@ function main() {
 		}
 	});
 }
+
 var scpSetColour = function(isExecuting, args) {
 	if (isExecuting) {
-
 		console.log("scpSetColour " + JSON.stringify(args));
-	}
-	if (isExecuting) {
+    
 		var chosencolour = 0;
-		if (typeof args["args"] !== "undefined") {
-			chosencolour = args["args"]["number"];
-		}
 		if (typeof args["number"] !== "undefined") {
 			chosencolour = args["number"];
 		}
@@ -144,24 +134,18 @@ var scpSetColour = function(isExecuting, args) {
 		}
 	}
 }
+
 var scpSetRandomColour = function(isExecuting, args) {
 	if (isExecuting) {
 		var allrides = map.rides;
 		var chosenRandomFlag = false;
-		if (typeof args["args"] !== "undefined") {
-			chosenRandomFlag = args["args"]["random_colour"];
-		}
 		if (typeof args["random_colour"] !== "undefined") {
 			chosenRandomFlag = args["random_colour"];
 		}
 		for (var i = 0; i < allrides.length; i++) {
 			var currRide = allrides[i];
 			if (currRide.classification == "stall" || currRide.classification == "facility") {
-				var random_as_integer = 0;
-				if (chosenRandomFlag) {
-					random_as_integer = 1;
-				}
-
+				var random_as_integer = chosenRandomFlag ? 1 : 0;
 				var actionType = 8; // SellingItemColourIsRandom
 				context.executeAction("ridesetappearance", {
 					ride: currRide.id,
