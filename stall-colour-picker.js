@@ -121,6 +121,14 @@ var scpSetColour = function(isExecuting, args) {
 		console.log("scpSetColour " + JSON.stringify(args));
     
 		var chosencolour = 0;
+    if (typeof args["args"] !== "undefined") { // for server use
+      if (typeof args["args"]["number"] !== "undefined") {
+        chosencolour = args["args"]["number"];
+      }
+      if (typeof args["args"]["stall_colour"] !== "undefined") {
+        chosencolour = args["args"]["stall_colour"];
+      }
+		}
 		if (typeof args["number"] !== "undefined") {
 			chosencolour = args["number"];
 		} else if (typeof args["stall_colour"] !== "undefined") {
@@ -166,6 +174,9 @@ var scpSetRandomColour = function(isExecuting, args) {
 	if (isExecuting) {
 		var allrides = map.rides;
 		var chosenRandomFlag = false;
+    if (typeof args["args"] !== "undefined") { // for server use
+			chosenRandomFlag = args["args"]["random_colour"];
+		}
 		if (typeof args["random_colour"] !== "undefined") {
 			chosenRandomFlag = args["random_colour"];
 		}
