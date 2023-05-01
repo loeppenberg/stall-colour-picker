@@ -3,6 +3,7 @@
 var auto_colour = context.sharedStorage.get("stall_colour_picker.auto_colour", false);
 var stall_colour = context.sharedStorage.get("stall_colour_picker.stall_colour", 0);
 var random_colour = context.sharedStorage.get("stall_colour_picker.random_colour", false);
+var version = '1.2.1';
 
 function checkPermissionCurrentPlayer(permission) {
 	var lcl_Group = network.getGroup(network.currentPlayer.group)
@@ -35,7 +36,7 @@ function main() {
 	ui.registerMenuItem(name, function() {
 		if (window == null) {
 			window = ui.openWindow({
-				title: "Stall Colour Picker",
+				title: "Stall Colour Picker " + version,
 				id: 1,
 				classification: "Stall Colour Picker",
 				width: 300,
@@ -213,7 +214,7 @@ var scpSetRandomColour = function(isExecuting, args) {
 
 registerPlugin({
 	name: 'stall colour picker',
-	version: '1.2',
+	version: version,
 	authors: ['eluya', 'mrmagic2020'],
 	type: 'remote',
 	targetApiVersion: 68,
