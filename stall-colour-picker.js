@@ -1,9 +1,9 @@
 /// <reference path="../bin/openrct2.d.ts" />
 
-var auto_colour = context.sharedStorage.get("stall_colour_picker.auto_colour", false);
-var stall_colour = context.sharedStorage.get("stall_colour_picker.stall_colour", 0);
-var random_colour = context.sharedStorage.get("stall_colour_picker.random_colour", false);
-var version = '1.2.1';
+var auto_colour = context.getParkStorage().get("stall_colour_picker.auto_colour", false);
+var stall_colour = context.getParkStorage().get("stall_colour_picker.stall_colour", 0);
+var random_colour = context.getParkStorage().get("stall_colour_picker.random_colour", false);
+var version = '1.2.2';
 
 function checkPermissionCurrentPlayer(permission) {
 	var lcl_Group = network.getGroup(network.currentPlayer.group)
@@ -64,7 +64,7 @@ function main() {
           isChecked: auto_colour,
           onChange: function (isChecked) {
             auto_colour = isChecked;
-            context.sharedStorage.set("stall_colour_picker.auto_colour", auto_colour);
+            context.getParkStorage().set("stall_colour_picker.auto_colour", auto_colour);
           }
         }, {
 					type: "checkbox",
@@ -79,8 +79,7 @@ function main() {
 						//var isAdmin = checkPermissionCurrentPlayer("cheat");
 						//if (isAdmin) {
 						random_colour = isChecked;
-						// TODO do this in an action (sharedstorage), or give number as atttribute to executeaction
-						context.sharedStorage.set("stall_colour_picker.random_colour", random_colour);
+						context.getParkStorage().set("stall_colour_picker.random_colour", random_colour);
 						context.executeAction("stall_colour_picker_set_random_flag", { random_colour });
 						//	}
 					}
@@ -96,8 +95,7 @@ function main() {
 						//var isAdmin = checkPermissionCurrentPlayer("cheat");
 						// if (isAdmin) {
 						stall_colour = number;
-						// TODO do this in an action (sharedstorage), or give number as atttribute to executeaction
-						context.sharedStorage.set("stall_colour_picker.stall_colour", stall_colour);
+						context.getParkStorage().set("stall_colour_picker.stall_colour", stall_colour);
 						context.executeAction("stall_colour_picker_set_colour", { number });
 						//}
 					}
@@ -107,8 +105,8 @@ function main() {
 	});
 
   context.subscribe("interval.day", function () {
-    if (context.sharedStorage.get("stall_colour_picker.auto_colour")) {
-      if (context.sharedStorage.get("stall_colour_picker.random_colour")) {
+    if (context.getParkStorage().get("stall_colour_picker.auto_colour")) {
+      if (context.getParkStorage().get("stall_colour_picker.random_colour")) {
         context.executeAction("stall_colour_picker_set_random_flag", { random_colour });
       } else {
         context.executeAction("stall_colour_picker_set_colour", { stall_colour });
