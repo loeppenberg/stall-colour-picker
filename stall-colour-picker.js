@@ -1,8 +1,8 @@
 /// <reference path="../bin/openrct2.d.ts" />
 
-var auto_colour = context.getParkStorage().get("stall_colour_picker.auto_colour", false);
-var stall_colour = context.getParkStorage().get("stall_colour_picker.stall_colour", 0);
-var random_colour = context.getParkStorage().get("stall_colour_picker.random_colour", false);
+var auto_colour = false;
+var stall_colour = 0;
+var random_colour = false;
 var version = '1.2.2';
 
 function checkPermissionCurrentPlayer(permission) {
@@ -31,8 +31,17 @@ function main() {
 			return scpSetRandomColour(true, args);
 		}
 	);
-
+	context.registerAction(
+		"stall_colour_picker_set_setting",
+		function(args) {
+			return setSetting(false, args);
+		},
+		function(args) {
+			return setSetting(true, args);
+		}
+	);
 	var name = "Stall Colours";
+	if (typeof ui !== "undefined") {
 	ui.registerMenuItem(name, function() {
 		if (window == null) {
 			window = ui.openWindow({
@@ -64,7 +73,7 @@ function main() {
           isChecked: auto_colour,
           onChange: function (isChecked) {
             auto_colour = isChecked;
-            context.getParkStorage().set("stall_colour_picker.auto_colour", auto_colour);
+            context.executeAction("stall_colour_picker_set_setting", { key: "stall_colour_picker.auto_colour", value: auto_colour });
           }
         }, {
 					type: "checkbox",
@@ -79,7 +88,7 @@ function main() {
 						//var isAdmin = checkPermissionCurrentPlayer("cheat");
 						//if (isAdmin) {
 						random_colour = isChecked;
-						context.getParkStorage().set("stall_colour_picker.random_colour", random_colour);
+						context.executeAction("stall_colour_picker_set_setting", { key: "stall_colour_picker.random_colour", value: random_colour });
 						context.executeAction("stall_colour_picker_set_random_flag", { random_colour });
 						//	}
 					}
@@ -95,7 +104,7 @@ function main() {
 						//var isAdmin = checkPermissionCurrentPlayer("cheat");
 						// if (isAdmin) {
 						stall_colour = number;
-						context.getParkStorage().set("stall_colour_picker.stall_colour", stall_colour);
+						context.executeAction("stall_colour_picker_set_setting", { key: "stall_colour_picker.stall_colour", value: stall_colour });
 						context.executeAction("stall_colour_picker_set_colour", { number });
 						//}
 					}
@@ -103,7 +112,7 @@ function main() {
 			})
 		}
 	});
-
+	}
   context.subscribe("interval.day", function () {
     if (context.getParkStorage().get("stall_colour_picker.auto_colour")) {
       if (context.getParkStorage().get("stall_colour_picker.random_colour")) {
@@ -113,11 +122,47 @@ function main() {
       }
     }
   });
+// console.log("auto_colour: " + context.getParkStorage().get("stall_colour_picker.auto_colour"));
+// console.log("stall_colour: " + context.getParkStorage().get("stall_colour_picker.stall_colour"));
+// console.log("random_colour: " + context.getParkStorage().get("stall_colour_picker.random_colour"));
+
+auto_colour = context.getParkStorage().get("stall_colour_picker.auto_colour", false);
+stall_colour = context.getParkStorage().get("stall_colour_picker.stall_colour", 0);
+random_colour = context.getParkStorage().get("stall_colour_picker.random_colour", false);
 }
 
+var setSetting = function(isExecuting, args) {
+	
+	// This needs to be done in seperate action, to be synchronized to server hosts .park file.
+	if (isExecuting) {
+		var key = "key";
+		var value = "value";
+		//console.log("setSettings: " + JSON.stringify(args));
+		
+		if (typeof args["args"] !== "undefined") { // for server use
+			key = args["args"]["key"];
+			value = args["args"]["value"];
+		}
+		if (typeof args["key"] !== "undefined") { // client use
+			key = args["key"];			
+			value = args["value"];
+		}
+		console.log(key + ": " + value)
+		context.getParkStorage().set(key, value);
+	}
+		return {
+		cost: 0,
+		expenditureType: "landscaping",
+		position: {
+			x: -1,
+			y: -1,
+			z: 0
+		}
+	}
+}
 var scpSetColour = function(isExecuting, args) {
 	if (isExecuting) {
-		console.log("scpSetColour " + JSON.stringify(args));
+		//console.log("scpSetColour " + JSON.stringify(args));
     
 		var chosencolour = 0;
     if (typeof args["args"] !== "undefined") { // for server use
