@@ -42,109 +42,109 @@ function main() {
 	);
 	var name = "Stall Colours";
 	if (typeof ui !== "undefined") {
-	ui.registerMenuItem(name, function() {
-		if (window == null) {
-			window = ui.openWindow({
-				title: "Stall Colour Picker " + version,
-				id: 1,
-				classification: "Stall Colour Picker",
-				width: 300,
-				height: 96,
-				onClose: function onClose() {
-					window = null;
-				},
-				widgets: [{
-					type: "label",
-					name: "randomColour",
-					x: 10,
-					y: 20,
+		ui.registerMenuItem(name, function() {
+			if (window == null) {
+				window = ui.openWindow({
+					title: "Stall Colour Picker " + version,
+					id: 1,
+					classification: "Stall Colour Picker",
 					width: 300,
-					height: 10,
-					text: "Changes Colour for EVERY Stall/Facility",
-				}, {
-          type: "checkbox",
-          name: "autoColour",
-          x: 10,
-          y: 40,
-          width: 130,
-          height: 13,
-          text: "Automatically Recolour New Stalls",
-          tooltip: "Every in-game day, all stall colour schemes will be set to the configured.",
-          isChecked: auto_colour,
-          onChange: function (isChecked) {
-            auto_colour = isChecked;
-            context.executeAction("stall_colour_picker_set_setting", { key: "stall_colour_picker.auto_colour", value: auto_colour });
-          }
-        }, {
-					type: "checkbox",
-					name: "randomColour",
-					x: 10,
-					y: 60,
-					width: 130,
-					height: 13,
-					text: "Use Random Colour",
-          isChecked: random_colour,
-					onChange: function onChange(isChecked) {
-						//var isAdmin = checkPermissionCurrentPlayer("cheat");
-						//if (isAdmin) {
-						random_colour = isChecked;
-						context.executeAction("stall_colour_picker_set_setting", { key: "stall_colour_picker.random_colour", value: random_colour });
-						context.executeAction("stall_colour_picker_set_random_flag", { random_colour });
-						//	}
-					}
-				}, {
-					type: "colourpicker",
-					name: "pickColour",
-					x: 10,
-					y: 80,
-					width: 35,
-					height: 13,
-					colour: stall_colour,
-					onChange: function onChange(number) {
-						//var isAdmin = checkPermissionCurrentPlayer("cheat");
-						// if (isAdmin) {
-						stall_colour = number;
-						context.executeAction("stall_colour_picker_set_setting", { key: "stall_colour_picker.stall_colour", value: stall_colour });
-						context.executeAction("stall_colour_picker_set_colour", { number });
-						//}
-					}
-				}]
-			})
+					height: 96,
+					onClose: function onClose() {
+						window = null;
+					},
+					widgets: [{
+						type: "label",
+						name: "randomColour",
+						x: 10,
+						y: 20,
+						width: 300,
+						height: 10,
+						text: "Changes Colour for EVERY Stall/Facility",
+					}, {
+						type: "checkbox",
+						name: "autoColour",
+						x: 10,
+						y: 40,
+						width: 130,
+						height: 13,
+						text: "Automatically Recolour New Stalls",
+						tooltip: "Every in-game day, all stall colour schemes will be set to the configured.",
+						isChecked: auto_colour,
+						onChange: function(isChecked) {
+							auto_colour = isChecked;
+							context.executeAction("stall_colour_picker_set_setting", { key: "stall_colour_picker.auto_colour", value: auto_colour });
+						}
+					}, {
+						type: "checkbox",
+						name: "randomColour",
+						x: 10,
+						y: 60,
+						width: 130,
+						height: 13,
+						text: "Use Random Colour",
+						isChecked: random_colour,
+						onChange: function onChange(isChecked) {
+							//var isAdmin = checkPermissionCurrentPlayer("cheat");
+							//if (isAdmin) {
+							random_colour = isChecked;
+							context.executeAction("stall_colour_picker_set_setting", { key: "stall_colour_picker.random_colour", value: random_colour });
+							context.executeAction("stall_colour_picker_set_random_flag", { random_colour });
+							//	}
+						}
+					}, {
+						type: "colourpicker",
+						name: "pickColour",
+						x: 10,
+						y: 80,
+						width: 35,
+						height: 13,
+						colour: stall_colour,
+						onChange: function onChange(number) {
+							//var isAdmin = checkPermissionCurrentPlayer("cheat");
+							// if (isAdmin) {
+							stall_colour = number;
+							context.executeAction("stall_colour_picker_set_setting", { key: "stall_colour_picker.stall_colour", value: stall_colour });
+							context.executeAction("stall_colour_picker_set_colour", { number });
+							//}
+						}
+					}]
+				})
+			}
+		});
+	}
+	context.subscribe("interval.day", function() {
+		if (context.getParkStorage().get("stall_colour_picker.auto_colour")) {
+			if (context.getParkStorage().get("stall_colour_picker.random_colour")) {
+				context.executeAction("stall_colour_picker_set_random_flag", { random_colour });
+			} else {
+				context.executeAction("stall_colour_picker_set_colour", { stall_colour });
+			}
 		}
 	});
-	}
-  context.subscribe("interval.day", function () {
-    if (context.getParkStorage().get("stall_colour_picker.auto_colour")) {
-      if (context.getParkStorage().get("stall_colour_picker.random_colour")) {
-        context.executeAction("stall_colour_picker_set_random_flag", { random_colour });
-      } else {
-        context.executeAction("stall_colour_picker_set_colour", { stall_colour });
-      }
-    }
-  });
-// console.log("auto_colour: " + context.getParkStorage().get("stall_colour_picker.auto_colour"));
-// console.log("stall_colour: " + context.getParkStorage().get("stall_colour_picker.stall_colour"));
-// console.log("random_colour: " + context.getParkStorage().get("stall_colour_picker.random_colour"));
+	// console.log("auto_colour: " + context.getParkStorage().get("stall_colour_picker.auto_colour"));
+	// console.log("stall_colour: " + context.getParkStorage().get("stall_colour_picker.stall_colour"));
+	// console.log("random_colour: " + context.getParkStorage().get("stall_colour_picker.random_colour"));
 
-auto_colour = context.getParkStorage().get("stall_colour_picker.auto_colour", false);
-stall_colour = context.getParkStorage().get("stall_colour_picker.stall_colour", 0);
-random_colour = context.getParkStorage().get("stall_colour_picker.random_colour", false);
+	auto_colour = context.getParkStorage().get("stall_colour_picker.auto_colour", false);
+	stall_colour = context.getParkStorage().get("stall_colour_picker.stall_colour", 0);
+	random_colour = context.getParkStorage().get("stall_colour_picker.random_colour", false);
 }
 
 var setSetting = function(isExecuting, args) {
-	
+
 	// This needs to be done in seperate action, to be synchronized to server hosts .park file.
 	if (isExecuting) {
 		var key = "key";
 		var value = "value";
 		//console.log("setSettings: " + JSON.stringify(args));
-		
+
 		if (typeof args["args"] !== "undefined") { // for server use
 			key = args["args"]["key"];
 			value = args["args"]["value"];
 		}
 		if (typeof args["key"] !== "undefined") { // client use
-			key = args["key"];			
+			key = args["key"];
 			value = args["value"];
 		}
 		console.log(key + ": " + value)
@@ -154,7 +154,7 @@ var setSetting = function(isExecuting, args) {
 		stall_colour = context.getParkStorage().get("stall_colour_picker.stall_colour", 0);
 		random_colour = context.getParkStorage().get("stall_colour_picker.random_colour", false);
 	}
-		return {
+	return {
 		cost: 0,
 		expenditureType: "landscaping",
 		position: {
@@ -167,21 +167,21 @@ var setSetting = function(isExecuting, args) {
 var scpSetColour = function(isExecuting, args) {
 	if (isExecuting) {
 		//console.log("scpSetColour " + JSON.stringify(args));
-    
+
 		var chosencolour = 0;
-    if (typeof args["args"] !== "undefined") { // for server use
-      if (typeof args["args"]["number"] !== "undefined") {
-        chosencolour = args["args"]["number"];
-      }
-      if (typeof args["args"]["stall_colour"] !== "undefined") {
-        chosencolour = args["args"]["stall_colour"];
-      }
+		if (typeof args["args"] !== "undefined") { // for server use
+			if (typeof args["args"]["number"] !== "undefined") {
+				chosencolour = args["args"]["number"];
+			}
+			if (typeof args["args"]["stall_colour"] !== "undefined") {
+				chosencolour = args["args"]["stall_colour"];
+			}
 		}
 		if (typeof args["number"] !== "undefined") {
 			chosencolour = args["number"];
 		} else if (typeof args["stall_colour"] !== "undefined") {
-      chosencolour = args["stall_colour"]; // added for auto set colours - line 111
-    }
+			chosencolour = args["stall_colour"]; // added for auto set colours - line 111
+		}
 
 		var allrides = map.rides;
 		for (var i = 0; i < allrides.length; i++) {
@@ -222,7 +222,7 @@ var scpSetRandomColour = function(isExecuting, args) {
 	if (isExecuting) {
 		var allrides = map.rides;
 		var chosenRandomFlag = false;
-    if (typeof args["args"] !== "undefined") { // for server use
+		if (typeof args["args"] !== "undefined") { // for server use
 			chosenRandomFlag = args["args"]["random_colour"];
 		}
 		if (typeof args["random_colour"] !== "undefined") {
