@@ -3,7 +3,7 @@
 var auto_colour = false;
 var stall_colour = 0;
 var random_colour = false;
-var version = '1.2.2';
+var version = '1.2.3';
 
 function checkPermissionCurrentPlayer(permission) {
 	var lcl_Group = network.getGroup(network.currentPlayer.group)
@@ -149,6 +149,10 @@ var setSetting = function(isExecuting, args) {
 		}
 		console.log(key + ": " + value)
 		context.getParkStorage().set(key, value);
+		//console.log(key + ": " + context.getParkStorage().get(key));
+		auto_colour = context.getParkStorage().get("stall_colour_picker.auto_colour", false);
+		stall_colour = context.getParkStorage().get("stall_colour_picker.stall_colour", 0);
+		random_colour = context.getParkStorage().get("stall_colour_picker.random_colour", false);
 	}
 		return {
 		cost: 0,
